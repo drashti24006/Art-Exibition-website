@@ -1,0 +1,26 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Site Settings</h2>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3"><label class="form-label">Site Name</label><input type="text" name="site_name" class="form-control" value="{{ site_config.site_name }}"></div>
+            <div class="mb-3"><label class="form-label">Hero Title</label><input type="text" name="hero_title" class="form-control" value="{{ site_config.hero_title }}"></div>
+            <div class="mb-3"><label class="form-label">Hero Subtitle</label><input type="text" name="hero_subtitle" class="form-control" value="{{ site_config.hero_subtitle }}"></div>
+            <div class="mb-3"><label class="form-label">Hero Background (Upload or URL)</label><input type="file" name="hero_background" class="form-control mb-1" accept="image/*"><input type="url" name="hero_background_url" class="form-control" value="{{ site_config.hero_background_url|default:'' }}" placeholder="Or paste image URL"></div>
+            <hr>
+            <h5>About Us</h5>
+            <div class="mb-3"><label class="form-label">Title</label><input type="text" name="about_us_title" class="form-control" value="{{ site_config.about_us_title }}"></div>
+            <div class="mb-3"><label class="form-label">Content</label><textarea name="about_us_content" class="form-control" rows="4">{{ site_config.about_us_content }}</textarea></div>
+            <hr>
+            <h5>Contact</h5>
+            <div class="mb-3"><label class="form-label">Email</label><input type="email" name="contact_email" class="form-control" value="{{ site_config.contact_email }}"></div>
+            <div class="mb-3"><label class="form-label">Phone</label><input type="text" name="contact_phone" class="form-control" value="{{ site_config.contact_phone }}"></div>
+            <div class="mb-3"><label class="form-label">Address</label><textarea name="contact_address" class="form-control" rows="3">{{ site_config.contact_address }}</textarea></div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

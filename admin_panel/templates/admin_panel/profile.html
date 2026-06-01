@@ -1,0 +1,72 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2 class="mb-4">Admin Profile</h2>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0">Profile (Username, Email, Picture)</h5></div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if admin_user.profile_pic %}
+                    <img src="{{ admin_user.profile_pic.url }}" alt="Profile" class="rounded-circle" style="width:100px;height:100px;object-fit:cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center" style="width:100px;height:100px;font-size:2.5rem;">{{ admin_user.get_display_name }}</div>
+                    {% endif %}
+                </div>
+                <form method="post" enctype="multipart/form-data" action="?">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="profile">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        {{ profile_form.username }}
+                        {% if profile_form.username.errors %}<div class="text-danger small">{{ profile_form.username.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        {{ profile_form.email }}
+                        {% if profile_form.email.errors %}<div class="text-danger small">{{ profile_form.email.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Profile Picture</label>
+                        {{ profile_form.profile_pic }}
+                        {% if profile_form.profile_pic.errors %}<div class="text-danger small">{{ profile_form.profile_pic.errors.0 }}</div>{% endif %}
+                        <small class="text-muted">Leave empty to keep current.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0">Change Password</h5></div>
+            <div class="card-body">
+                <form method="post" action="?">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="password">
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        {{ password_form.current_password }}
+                        {% if password_form.current_password.errors %}<div class="text-danger small">{{ password_form.current_password.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        {{ password_form.new_password }}
+                        {% if password_form.new_password.errors %}<div class="text-danger small">{{ password_form.new_password.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        {{ password_form.new_password_confirm }}
+                        {% if password_form.new_password_confirm.errors %}<div class="text-danger small">{{ password_form.new_password_confirm.errors.0 }}</div>{% endif %}
+                        {% if password_form.non_field_errors %}<div class="text-danger small">{{ password_form.non_field_errors.0 }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-warning">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

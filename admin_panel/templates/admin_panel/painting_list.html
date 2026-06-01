@@ -1,0 +1,36 @@
+{% extends 'admin_panel/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Paintings</h2>
+    <a href="{% url 'admin_panel:painting_add' %}" class="btn btn-primary">Add Painting</a>
+</div>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Price</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+            {% for p in paintings %}
+            <tr>
+                <td><img src="{{ p.get_image_url }}" alt="" style="width:50px;height:50px;object-fit:cover;border-radius:8px;"></td>
+                <td>{{ p.title }}</td>
+                <td>{{ p.category|default:"-" }}</td>
+                <td>Rs.{{ p.price|intcomma }}</td>
+                <td>{% if p.is_available %}<span class="badge bg-success">Available</span>{% else %}<span class="badge bg-secondary">Unavailable</span>{% endif %}</td>
+                <td class="text-end">
+                    <a href="{% url 'admin_panel:painting_edit' p.id %}" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                    <form method="post" action="{% url 'admin_panel:painting_delete' p.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete painting {{ p.title }}?');">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No paintings.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

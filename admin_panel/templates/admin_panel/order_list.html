@@ -1,0 +1,25 @@
+{% extends 'admin_panel/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<h2 class="mb-4">Orders</h2>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th><th></th></tr></thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td>{{ o.order_number }}</td>
+                <td>{{ o.full_name }}<br><small class="text-muted">{{ o.email }}</small></td>
+                <td>Rs.{{ o.total_amount|intcomma }}</td>
+                <td>{{ o.get_status_display }}</td>
+                <td>{{ o.created_at|date:"d M Y" }}</td>
+                <td><a href="{% url 'admin_panel:order_detail' o.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">No orders.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

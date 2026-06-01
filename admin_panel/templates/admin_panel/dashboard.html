@@ -1,0 +1,280 @@
+{% extends 'admin_panel/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Paintings</h6>
+                        <h3 class="mb-0">{{ total_paintings }}</h3>
+                    </div>
+                    <div class="text-primary" style="font-size: 2rem;">
+                        <i class="bi bi-palette"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Orders</h6>
+                        <h3 class="mb-0">{{ total_orders }}</h3>
+                    </div>
+                    <div class="text-success" style="font-size: 2rem;">
+                        <i class="bi bi-cart-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Revenue</h6>
+                        <h3 class="mb-0">₹{{ total_revenue|intcomma }}</h3>
+                    </div>
+                    <div class="text-warning" style="font-size: 2rem;">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <!-- Revenue Chart -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Revenue Trend (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Status Pie Chart -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Order Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Bar Chart and Recent Orders -->
+<div class="row g-4 mb-4">
+    <!-- Category Chart -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Top Categories</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="categoryChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td><a href="{% url 'admin_panel:order_detail' order.id %}">{{ order.order_number }}</a></td>
+                                <td>{{ order.user.username }}</td>
+                                <td>₹{{ order.total_amount|intcomma }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if order.status == 'pending' %}bg-warning
+                                        {% elif order.status == 'confirmed' %}bg-info
+                                        {% elif order.status == 'shipped' %}bg-primary
+                                        {% elif order.status == 'delivered' %}bg-success
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-muted text-center">No orders yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Revenue Line Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const revenueData = {
+    labels: [
+        {% for item in daily_revenue %}
+            '{{ item.date|date:"M d" }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    datasets: [{
+        label: 'Revenue (₹)',
+        data: [
+            {% for item in daily_revenue %}
+                {{ item.revenue|default:0 }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.4,
+        fill: true
+    }]
+};
+new Chart(revenueCtx, {
+    type: 'line',
+    data: revenueData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₹' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Order Status Pie Chart
+const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
+const statusData = {
+    labels: [
+        {% for item in order_status_data %}
+            '{{ item.status|title }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    datasets: [{
+        data: [
+            {% for item in order_status_data %}
+                {{ item.count }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        backgroundColor: [
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(255, 99, 132, 0.8)'
+        ],
+        borderWidth: 2,
+        borderColor: '#fff'
+    }]
+};
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: statusData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Category Bar Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+const categoryData = {
+    labels: [
+        {% for cat in category_data %}
+            '{{ cat.name }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    datasets: [{
+        label: 'Number of Paintings',
+        data: [
+            {% for cat in category_data %}
+                {{ cat.painting_count }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)'
+        ],
+        borderWidth: 2,
+        borderColor: '#fff'
+    }]
+};
+new Chart(categoryCtx, {
+    type: 'bar',
+    data: categoryData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Contact Submissions</h2>
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in contacts %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.email }}</td>
+                        <td>{{ c.message|truncatewords:15 }}</td>
+                        <td>{{ c.created_at|date:"d M Y" }}</td>
+                        <td class="text-end">
+                            <form method="post" action="{% url 'admin_panel:contact_delete' c.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this message from {{ c.name }}?');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted">No contacts.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

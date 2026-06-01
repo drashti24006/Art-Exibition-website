@@ -1,0 +1,40 @@
+{% extends 'admin_panel/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<h2 class="mb-4">Order {{ order.order_number }}</h2>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5>Items</h5>
+                <table class="table"><thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead>
+                <tbody>{% for i in order.items.all %}<tr><td>{{ i.painting.title }}</td><td>{{ i.quantity }}</td><td>Rs.{{ i.subtotal|intcomma }}</td></tr>{% endfor %}</tbody>
+                <tfoot><tr><th colspan="2">Total</th><th>Rs.{{ order.total_amount|intcomma }}</th></tr></tfoot></table>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ order.full_name }}</p>
+                <p><strong>Email:</strong> {{ order.email }}</p>
+                <p><strong>Phone:</strong> {{ order.phone }}</p>
+                <p><strong>Address:</strong> {{ order.shipping_address }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5>Update Status</h5>
+                <form method="post" action="{% url 'admin_panel:order_status' order.id %}">
+                    {% csrf_token %}
+                    <select name="status" class="form-select mb-2">
+                        {% for k,v in order_status_choices %}<option value="{{ k }}" {% if order.status == k %}selected{% endif %}>{{ v }}</option>{% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary w-100">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
