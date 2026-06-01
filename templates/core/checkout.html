@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Checkout - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="font-display mb-4">Checkout - Bill Details</h1>
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="card card-art mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4">Shipping & Billing Information</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" name="full_name" class="form-control" value="{{ form.full_name.value }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" value="{{ form.email.value }}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Mobile No</label>
+                                    <input type="text" name="phone" class="form-control" value="{{ form.phone.value }}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Address</label>
+                                    <textarea name="shipping_address" class="form-control" rows="4" required>{{ form.shipping_address.value }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Payment Method</label>
+                                    <div class="d-flex gap-3">
+                                        <label><input type="radio" name="payment_method" value="cod" checked> Cash on Delivery</label>
+                                        <label><input type="radio" name="payment_method" value="online"> Online Payment</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Notes (optional)</label>
+                                    <textarea name="notes" class="form-control" rows="2">{{ form.notes.value }}</textarea>
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <button type="submit" class="btn btn-art btn-lg">Place Order</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card card-art sticky-top">
+                    <div class="card-body">
+                        <h5 class="mb-4">Order Summary</h5>
+                        {% for item in cart_items %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span>{{ item.painting.title }} x {{ item.quantity }}</span>
+                            </div>
+                            <span>Rs.{{ item.subtotal|intcomma }}</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Total</span>
+                            <span style="color: var(--art-gold);">Rs.{{ cart_total|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ site_settings.site_name }}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --art-ivory: #FAF8F5;
+            --art-charcoal: #1C1C1C;
+            --art-gold: #C9A962;
+            --art-terracotta: #B85C38;
+            --art-sage: #7D8B6F;
+            --art-cream: #F5F0E8;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--art-ivory);
+            color: var(--art-charcoal);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .font-display { font-family: 'Playfair Display', serif; }
+
+        /* Navbar */
+        .navbar-art {
+            background: rgba(28, 28, 28, 0.97) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+            padding: 0.75rem 0;
+        }
+        .navbar-art .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--art-gold) !important;
+            letter-spacing: 0.5px;
+        }
+        .navbar-art .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .navbar-art .nav-link:hover, .navbar-art .nav-link.active {
+            color: var(--art-gold) !important;
+            background: rgba(201, 169, 98, 0.15);
+        }
+
+        /* User avatar circle */
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--art-gold), var(--art-terracotta));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .cart-badge {
+            background: var(--art-terracotta);
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.25em 0.5em;
+            border-radius: 50%;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .btn-art {
+            background: linear-gradient(135deg, var(--art-gold), #a88b4a);
+            color: var(--art-charcoal);
+            border: none;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-art:hover {
+            background: linear-gradient(135deg, #d4b872, var(--art-gold));
+            color: var(--art-charcoal);
+            box-shadow: 0 6px 20px rgba(201, 169, 98, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-outline-art {
+            border: 2px solid var(--art-gold);
+            color: var(--art-gold);
+            background: transparent;
+        }
+        .btn-outline-art:hover {
+            background: var(--art-gold);
+            color: var(--art-charcoal);
+        }
+
+        /* Cards */
+        .card-art {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(28, 28, 28, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-art:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(28, 28, 28, 0.12);
+        }
+        .card-art .card-img-wrap {
+            aspect-ratio: 1;
+            overflow: hidden;
+        }
+        .card-art .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card-art:hover .card-img-wrap img {
+            transform: scale(1.08);
+        }
+
+        footer {
+            background: var(--art-charcoal);
+            color: rgba(255,255,255,0.85);
+            padding: 2.5rem 0;
+            margin-top: auto;
+        }
+        .alert { border-radius: 12px; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% block nav %}
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-art sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'core:home' %}">
+                <i class="bi bi-palette2 me-2"></i>{{ site_settings.site_name }}
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Home</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                            {% for c in nav_categories %}
+                            <li><a class="dropdown-item" href="{% url 'core:category_page' c.slug %}">{{ c.name }}</a></li>
+                            {% empty %}
+                            <li><span class="dropdown-item text-muted">No categories</span></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:gallery' %}">Gallery</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:about_us' %}">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:contact_us' %}">Contact Us</a></li>
+                </ul>
+                <ul class="navbar-nav align-items-center gap-2 ms-3">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <div class="user-avatar" title="{{ user.email }}">
+                            {{ user.get_display_name }}
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:order_list' %}">My Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'core:logout' %}">Logout</a></li>
+                    {% else %}
+                    <li class="nav-item"><a class="btn btn-outline-art btn-sm" href="{% url 'core:register' %}">Register</a></li>
+                    <li class="nav-item"><a class="btn btn-art btn-sm" href="{% url 'core:login' %}">Login</a></li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'core:cart' %}">
+                            <i class="bi bi-cart3 fs-5"></i>
+                            {% if cart_count %}<span class="cart-badge position-absolute top-0 start-100 translate-middle">{{ cart_count }}</span>{% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <main class="flex-grow-1">
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block footer %}
+    <footer class="mt-auto">
+        <div class="container text-center">
+            <p class="mb-1 font-display fs-5" style="color: var(--art-gold);">{{ site_settings.site_name }}</p>
+            <p class="small mb-0 opacity-75">© {% now "Y" %} — Mandala, Portrait & Shading Art Exhibition</p>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

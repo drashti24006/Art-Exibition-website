@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ site_settings.site_name }} - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section position-relative overflow-hidden" style="min-height: 75vh; background: linear-gradient(rgba(28,28,28,0.6), rgba(28,28,28,0.5)), url('{{ site_settings.get_hero_bg }}') center/cover no-repeat;">
+    <div class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
+        <div class="text-center text-white px-3">
+            <h1 class="font-display display-4 fw-bold mb-3" style="text-shadow: 0 2px 20px rgba(0,0,0,0.3);">{{ site_settings.hero_title }}</h1>
+            <p class="lead mb-4 opacity-90">{{ site_settings.hero_subtitle }}</p>
+            {% if not user.is_authenticated %}
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'core:register' %}" class="btn btn-art btn-lg px-4">Register</a>
+                <a href="{% url 'core:login' %}" class="btn btn-outline-light btn-lg px-4">Login</a>
+            </div>
+            {% else %}
+            <a href="{% url 'core:gallery' %}" class="btn btn-art btn-lg px-4">Explore Gallery</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Artworks (latest 25 across all categories) -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="font-display text-center mb-5">Featured Artworks</h2>
+        <div class="row g-4">
+            {% for painting in paintings %}
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <div class="card card-art h-100">
+                    <a href="{% url 'core:painting_detail' painting.slug %}" class="text-decoration-none text-dark">
+                        <div class="card-img-wrap">
+                            <img src="{{ painting.get_image_url }}" alt="{{ painting.title }}" loading="lazy">
+                        </div>
+                        <div class="card-body p-3">
+                            <h6 class="card-title mb-1 text-truncate">{{ painting.title }}</h6>
+                            <p class="mb-0 fw-bold" style="color: var(--art-gold);">Rs.{{ painting.price|intcomma }}</p>
+                        </div>
+                    </a>
+                    {% if user.is_authenticated %}
+                    <div class="card-footer bg-transparent border-0 p-3 pt-0">
+                        <form action="{% url 'core:cart_add' painting.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn btn-art btn-sm w-100"><i class="bi bi-cart-plus me-1"></i> Add to Cart</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="card-footer bg-transparent border-0 p-3 pt-0">
+                        <a href="{% url 'core:login' %}?next={{ request.path }}" class="btn btn-outline-art btn-sm w-100">Login to Purchase</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No artworks yet. Admin will add soon.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-art border-0 shadow-sm">
+                    <div class="card-body p-5">
+                        <h2 class="font-display text-center mb-4">Register</h2>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
+                            </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-art w-100">Register</button>
+                        </form>
+                        <p class="text-center mt-3 mb-0">Already have an account? <a href="{% url 'core:login' %}">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

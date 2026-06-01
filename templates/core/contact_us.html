@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-5 mb-4">
+                <h1 class="font-display mb-4">Contact Us</h1>
+                <div class="card card-art border-0">
+                    <div class="card-body">
+                        <p><i class="bi bi-geo-alt me-2" style="color: var(--art-gold);"></i>{{ site_settings.contact_address }}</p>
+                        <p><i class="bi bi-envelope me-2" style="color: var(--art-gold);"></i>{{ site_settings.contact_email }}</p>
+                        <p><i class="bi bi-telephone me-2" style="color: var(--art-gold);"></i>{{ site_settings.contact_phone }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="card card-art border-0">
+                    <div class="card-body p-5">
+                        <h5 class="mb-4">Send us a message</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
+                            </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-art">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

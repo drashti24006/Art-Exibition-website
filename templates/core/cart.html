@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Cart - {{ site_settings.site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="font-display mb-4">Your Cart</h1>
+        {% if cart_items %}
+        <div class="row">
+            <div class="col-lg-8">
+                {% for item in cart_items %}
+                <div class="card card-art mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-4 col-md-3">
+                                <img src="{{ item.painting.get_image_url }}" alt="{{ item.painting.title }}" class="img-fluid rounded">
+                            </div>
+                            <div class="col-8 col-md-9">
+                                <h5 class="mb-1">{{ item.painting.title }}</h5>
+                                <p class="mb-2 fw-bold" style="color: var(--art-gold);">Rs.{{ item.painting.price|intcomma }} each</p>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                    <form action="{% url 'core:cart_update' item.id %}" method="post" class="d-flex align-items-center qty-form">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm" style="max-width: 130px;">
+                                            <button type="button" class="btn btn-outline-secondary btn-qty" data-delta="-1">-</button>
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control text-center qty-input">
+                                            <button type="button" class="btn btn-outline-secondary btn-qty" data-delta="1">+</button>
+                                        </div>
+                                    </form>
+                                    <span class="fw-bold">Subtotal: Rs.{{ item.subtotal|intcomma }}</span>
+                                    <form action="{% url 'core:cart_remove' item.id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-lg-4">
+                <div class="card card-art">
+                    <div class="card-body">
+                        <h5 class="mb-3">Order Summary</h5>
+                        <p class="d-flex justify-content-between"><span>Total</span><strong>Rs.{{ cart_total|intcomma }}</strong></p>
+                        <a href="{% url 'core:checkout' %}" class="btn btn-art w-100">Proceed to Checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">Your cart is empty.</p>
+            <a href="{% url 'core:gallery' %}" class="btn btn-art">Browse Gallery</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+<script>
+document.querySelectorAll('.btn-qty').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        var form = this.closest('form');
+        var input = form.querySelector('.qty-input');
+        var delta = parseInt(this.dataset.delta);
+        var val = parseInt(input.value) + delta;
+        input.value = Math.max(1, val);
+        form.submit();
+    });
+});
+document.querySelectorAll('.qty-input').forEach(function(input){
+    input.addEventListener('change', function(){
+        this.closest('form').submit();
+    });
+});
+</script>
+{% endblock %}
