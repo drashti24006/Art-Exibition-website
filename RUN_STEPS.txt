@@ -1,0 +1,70 @@
+================================================================================
+  ART EXHIBITION - Run Steps (Client & Admin Alag Alag)
+================================================================================
+
+PROJECT STRUCTURE:
+  - core/          = CLIENT side (login, gallery, cart, orders)
+  - admin_panel/   = ADMIN side (dashboard, paintings, orders) - COMPLETELY SEPARATE
+
+--------------------------------------------------------------------------------
+STEP 1: Virtual Environment Activate (if using venv)
+--------------------------------------------------------------------------------
+  cd c:\Users\PC\Desktop\art
+  venv\Scripts\activate
+
+--------------------------------------------------------------------------------
+STEP 2: Install Dependencies (first time only)
+--------------------------------------------------------------------------------
+  pip install -r requirements.txt
+
+--------------------------------------------------------------------------------
+STEP 3: Database Setup
+--------------------------------------------------------------------------------
+  python manage.py migrate
+  python manage.py seed_data
+  python manage.py createsuperuser
+
+  (createsuperuser - enter email, username, password for ADMIN only)
+
+--------------------------------------------------------------------------------
+STEP 4: Run Server
+--------------------------------------------------------------------------------
+  python manage.py runserver 8001
+
+  OR double-click: run.bat
+
+--------------------------------------------------------------------------------
+STEP 5: Open in Browser
+--------------------------------------------------------------------------------
+
+  CLIENT SITE (Customer):
+    URL:  http://127.0.0.1:8001/
+    Login: http://127.0.0.1:8001/login/
+    - Register new account (client)
+    - Login with client email/password
+    - Cart, checkout, orders - sab client login thi
+
+  ADMIN PANEL (Superuser only):
+    URL:  http://127.0.0.1:8001/admin-panel/
+    Login: http://127.0.0.1:8001/admin-panel/login/
+    - ONLY superuser credentials work
+    - Client login DOES NOT work here
+    - Admin login DOES NOT affect client
+
+--------------------------------------------------------------------------------
+IMPORTANT - Client & Admin BEY ALAG
+--------------------------------------------------------------------------------
+  - Client login (/login/)  => sirf client side access
+  - Admin login (/admin-panel/login/) => sirf admin panel access
+  
+  Example: Riya client login kare => Admin panel open NAI thay
+           Admin superuser login kare => Client cart/orders manage NAI thay
+
+  Koi pan client user admin side access NAI kari shakto.
+  Sirf createsuperuser thi banavelo superuser j admin panel access kare.
+
+--------------------------------------------------------------------------------
+FOLDERS:
+  core/         = Client (views, urls, templates/core/)
+  admin_panel/  = Admin (views, urls, templates/admin_panel/)
+================================================================================
